@@ -2,9 +2,7 @@
   SHT4x Humidity & Temp Sensor
   Adafruit 128x64 OLED FeatherWing
   Adafruit Feather M4 Express 
-
-  Show high and low temperature for the last 24 hours. 
-  Use an array of 1440 measurments and sort for the highest and lowest values to display.  
+ 
   Use buttons to display SHT40 information.
  ****************************************************/
 
@@ -13,15 +11,17 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SH110X.h>
+#include <math.h>
 
 #define VBATPIN A6
 
 float measuredBatteryVoltage = 0.0;
 float t, h = 0.0;
-float temperature_low, temperature_high = 0.0;
-float humidity_low, humidity_high = 0.0;
-// float temperature_array[1140] = {0.0};
-// float humidity_array[1440] = {0.0};
+double heat_index = 0.0;
+double dew_point = 0.0;
+double alpha = 0.0;
+double a = 17.625;
+double b = 243.04;
 
 Adafruit_SHT4x sht4 = Adafruit_SHT4x(); 
 Adafruit_SH1107 display = Adafruit_SH1107(64, 128, &Wire);
@@ -107,21 +107,6 @@ void setup() {
   display.setCursor(0,0);
   display.display(); // actually display all of the above
   delay(10);  // Move above display.display(); to stop start glitch?
-
-  // First reading so that values are not equal to 0.0 for high and low determinations. 
-  sensors_event_t humidity, temp;
-  sht4.getEvent(&humidity, &temp);
-
-  t = temp.temperature;
-  h = humidity.relative_humidity;
-  // temperature_array[1140] = {t};
-  // humidity_array[1440] = {h};
-  t = t * 9/5 + 32;
-  temperature_low = t;
-  temperature_high = t;
-  humidity_low = h;
-  humidity_high = h;
-
 }
 
 void loop() {
@@ -147,27 +132,15 @@ void loop() {
   measuredBatteryVoltage *= 3.3;  // Multiply by the analog reference voltage of 3.3V.
   measuredBatteryVoltage /= 1024; // Divide by 1024 to convert to a voltage.
 
+  alpha = log(h/100) + a*t/(b+t);
+  dew_point = (b*alpha)/(a-alpha);
+
   // Display to OLED 
   display.clearDisplay();
   display.setCursor(0,0);
 
   t = t * 9/5 + 32;
-
-  if(t <= temperature_low) {
-    temperature_low = t;
-  }
-
-  if(t >= temperature_high) {
-    temperature_high = t;
-  }
-
-  if(h <= humidity_low) {
-    humidity_low = h;
-  }
-
-  if(h >= humidity_high) {
-    humidity_high = h;
-  }
+  dew_point = dew_point * 9/5 +32;
 
   display.print(t);
   display.print(" *F   ");
@@ -175,21 +148,12 @@ void loop() {
   display.print(h);
   display.println(" %RH");
 
-  display.println("Low");
+  display.println();
+  display.print("Alpha: ");
+  display.println(alpha);
 
-  display.print(temperature_low);
-  display.print(" *F   ");
-
-  display.print(humidity_low);
-  display.println(" %RH");
-
-  display.println("High");
-
-  display.print(temperature_high);
-  display.print(" *F   ");
-
-  display.print(humidity_high);
-  display.println(" %RH");
+  display.print("Dewpoint: ");
+  display.println(dew_point);
 
   display.println();
   display.print("Battery: ");
