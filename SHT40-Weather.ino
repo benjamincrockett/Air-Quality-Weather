@@ -1,9 +1,25 @@
 /*************************************************** 
-  SHT4x Humidity & Temp Sensor
-  Adafruit 128x64 OLED FeatherWing
-  Adafruit Feather M4 Express 
+  SHT4x Humidity & Temp Sensor:       https://www.adafruit.com/product/5665
+  Adafruit 128x64 OLED FeatherWing:   https://www.adafruit.com/product/4650
+  Adafruit Feather M4 Express:        https://www.adafruit.com/product/3857
+  Adafruit SGP40 Air Quality Sensor:  https://www.adafruit.com/product/4829
  
-  Use buttons to display SHT40 information.
+  Use buttons to display sensor serial numbers.
+  SHT4x
+  SGP4x  
+
+  Arduino SAMD Boards
+  https://adafruit.github.io/arduino-board-index/package_adafruit_index.json
+
+
+  Adafruit SHT4x Library
+  Adafruit SSD1306
+  Adafruit Unified Sensor
+  Adafruit BusIO
+  Adafruit GFX Library
+  Adafruit SH110X
+  Adafruit SHT31 Library
+  Adafruit SGP40 Sensor
  ****************************************************/
 
 #include <Adafruit_SHT4x.h>
