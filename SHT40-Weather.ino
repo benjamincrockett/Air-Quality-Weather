@@ -53,7 +53,7 @@ void setup() {
     while (1);
   }
 
-  Serial.print("Found SHT3x + SGP40 serial #");
+  Serial.print("Found SGP40 serial #");
   Serial.print(sgp.serialnumber[0], HEX);
   Serial.print(sgp.serialnumber[1], HEX);
   Serial.println(sgp.serialnumber[2], HEX);
@@ -146,19 +146,19 @@ void loop() {
   t = temp.temperature;
   h = humidity.relative_humidity;
 
-  Serial.print("Temp *C = "); Serial.print(t); Serial.print("\t\t");
-  Serial.print("Hum. % = "); Serial.println(h);
+  // Serial.print("Temp *C = "); Serial.print(t); Serial.print("\t\t");
+  // Serial.print("Hum. % = "); Serial.println(h);
 
   sraw = sgp.measureRaw(t, h);
-  Serial.print("Raw measurement: ");
-  Serial.println(sraw);
+  // Serial.print("Raw measurement: ");
+  // Serial.println(sraw);
 
   voc_index = sgp.measureVocIndex(t, h);
-  Serial.print("Voc Index: ");
-  Serial.println(voc_index);
+  // Serial.print("Voc Index: ");
+  // Serial.println(voc_index);
 
-  Serial.print("Temperature: "); Serial.print(t); Serial.println(" degrees C");
-  Serial.print("Humidity: "); Serial.print(h); Serial.println("% rH");
+  // Serial.print("Temperature: "); Serial.print(t); Serial.println(" degrees C");
+  // Serial.print("Humidity: "); Serial.print(h); Serial.println("% rH");
 
   // Read the battery voltage. 
   measuredBatteryVoltage = analogRead(VBATPIN);
@@ -175,12 +175,6 @@ void loop() {
 
   t = t * 9/5 + 32;
   dew_point = dew_point * 9/5 +32;
-
-  timestamp = millis() - timestamp;
-
-  Serial.print("Read duration (ms): ");
-  Serial.println(timestamp);
-  Serial.println();
 
   display.print(t);
   display.print(" *F   ");
@@ -203,6 +197,8 @@ void loop() {
   display.print(measuredBatteryVoltage);
   display.println(" Volts");
 
+  timestamp = millis() - timestamp;
+
   display.print("Loop Time: ");
   display.print(timestamp);
 
@@ -210,6 +206,9 @@ void loop() {
   yield();
   display.display(); // actually display all of the above
 
-  delay(445);  // Loop time needs to be 1000 ms. 445 = 1000 - 555
-
+  delay(446);  // Loop time needs to be 1000 ms. 445 = 1000 - 555
+  
+  // Serial.print("Read duration (ms): ");
+  Serial.println(timestamp);
+  // Serial.println();
 }
