@@ -210,6 +210,6 @@ void loop() {
   yield();
   display.display(); // actually display all of the above
 
-  delay(1000);
+  delay(445);  // Loop time needs to be 1000 ms. 445 = 1000 - 555
 
 }
