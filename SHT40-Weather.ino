@@ -44,7 +44,7 @@ Adafruit_SGP40 sgp = Adafruit_SGP40();
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial) { delay(10); } // Wait for serial console to open!
+  // while (!Serial) { delay(10); } // Wait for serial console to open!
 
   Serial.println("SHT4x, SGP40, and 128x64 OLED Weather Station");
 
