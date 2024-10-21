@@ -3,6 +3,7 @@
   Adafruit 128x64 OLED FeatherWing:   https://www.adafruit.com/product/4650
   Adafruit Feather M4 Express:        https://www.adafruit.com/product/3857
   Adafruit SGP40 Air Quality Sensor:  https://www.adafruit.com/product/4829
+  STEMMA QT / Qwiic JST SH 4-Pin Cable - 50mm Long  https://www.adafruit.com/product/4399
  
   Use buttons to display sensor serial numbers.
   SHT4x
