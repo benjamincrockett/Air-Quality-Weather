@@ -10,4 +10,7 @@ Adafruit 128x64 OLED FeatherWing                    https://www.adafruit.com/pro
 
 Adafruit Feather M4 Express                         https://www.adafruit.com/product/3857
 
+Header Kit for Feather - 12-pin and 16-pin Female Header Set 
+https://www.adafruit.com/product/2886
+
 Adafruit SGP40 Air Quality Sensor                   https://www.adafruit.com/product/4829
