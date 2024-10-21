@@ -1,12 +1,27 @@
 /*************************************************** 
-  SHT4x Humidity & Temp Sensor
-  Adafruit 128x64 OLED FeatherWing
-  Adafruit Feather M4 Express 
+  SHT4x Humidity & Temp Sensor:       https://www.adafruit.com/product/5665
+  Adafruit 128x64 OLED FeatherWing:   https://www.adafruit.com/product/4650
+  Adafruit Feather M4 Express:        https://www.adafruit.com/product/3857
+  Adafruit SGP40 Air Quality Sensor:  https://www.adafruit.com/product/4829
  
-  Use buttons to display SHT40 information.
+  Use buttons to display sensor serial numbers.
+  SHT4x
+  SGP4x  
+
+  Arduino SAMD Boards
+  https://adafruit.github.io/arduino-board-index/package_adafruit_index.json
+
+  Adafruit SHT4x Library
+  Adafruit SSD1306
+  Adafruit Unified Sensor
+  Adafruit BusIO
+  Adafruit GFX Library
+  Adafruit SH110X
+  Adafruit SGP40 Sensor
  ****************************************************/
 
 #include <Adafruit_SHT4x.h>
+#include "Adafruit_SGP40.h"
 #include <SPI.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -23,16 +38,26 @@ double alpha = 0.0;
 double a = 17.625;
 double b = 243.04;
 
-Adafruit_SHT4x sht4 = Adafruit_SHT4x(); 
 Adafruit_SH1107 display = Adafruit_SH1107(64, 128, &Wire);
+Adafruit_SHT4x sht4 = Adafruit_SHT4x();
+Adafruit_SGP40 sgp = Adafruit_SGP40();
 
 void setup() {
   Serial.begin(115200);
+  // while (!Serial) { delay(10); } // Wait for serial console to open!
 
-  // while (!Serial)  // Wait for serial connection
-  //   delay(10);     // will pause Zero, Leonardo, etc until serial console opens
+  Serial.println("SHT4x, SGP40, and 128x64 OLED Weather Station");
 
-  Serial.println("SHT40 and 128x64 OLED Weather Station");
+  if (! sgp.begin()){
+    Serial.println("SGP40 sensor not found :(");
+    while (1);
+  }
+
+  Serial.print("Found SGP40 serial #");
+  Serial.print(sgp.serialnumber[0], HEX);
+  Serial.print(sgp.serialnumber[1], HEX);
+  Serial.println(sgp.serialnumber[2], HEX);
+
   if (! sht4.begin()) {
     Serial.println("Couldn't find SHT4x");
     while (1) delay(1);
@@ -110,21 +135,30 @@ void setup() {
 }
 
 void loop() {
-  sensors_event_t humidity, temp;
-  
   uint32_t timestamp = millis();
-  sht4.getEvent(&humidity, &temp);// populate temp and humidity objects with fresh data
-  timestamp = millis() - timestamp;
+
+  sensors_event_t humidity, temp;
+  uint16_t sraw;
+  int32_t voc_index;
+  
+  sht4.getEvent(&humidity, &temp); // populate temp and humidity objects with fresh data
 
   t = temp.temperature;
   h = humidity.relative_humidity;
 
-  Serial.print("Temperature: "); Serial.print(t); Serial.println(" degrees C");
-  Serial.print("Humidity: "); Serial.print(h); Serial.println("% rH");
+  // Serial.print("Temp *C = "); Serial.print(t); Serial.print("\t\t");
+  // Serial.print("Hum. % = "); Serial.println(h);
 
-  Serial.print("Read duration (ms): ");
-  Serial.println(timestamp);
-  Serial.println();
+  sraw = sgp.measureRaw(t, h);
+  // Serial.print("Raw measurement: ");
+  // Serial.println(sraw);
+
+  voc_index = sgp.measureVocIndex(t, h);
+  // Serial.print("Voc Index: ");
+  // Serial.println(voc_index);
+
+  // Serial.print("Temperature: "); Serial.print(t); Serial.println(" degrees C");
+  // Serial.print("Humidity: "); Serial.print(h); Serial.println("% rH");
 
   // Read the battery voltage. 
   measuredBatteryVoltage = analogRead(VBATPIN);
@@ -148,7 +182,7 @@ void loop() {
   display.print(h);
   display.println(" %RH");
 
-  display.println();
+  //display.println();
   display.print("Alpha: ");
   display.println(alpha);
 
@@ -156,14 +190,25 @@ void loop() {
   display.println(dew_point);
 
   display.println();
+  display.print("VOC Index: ");
+  display.println(voc_index);
+
   display.print("Battery: ");
   display.print(measuredBatteryVoltage);
-  display.print(" Volts");
+  display.println(" Volts");
+
+  timestamp = millis() - timestamp;
+
+  display.print("Loop Time: ");
+  display.print(timestamp);
 
   delay(10);
   yield();
   display.display(); // actually display all of the above
 
-  delay(1000);
-
+  delay(446);  // Loop time needs to be 1000 ms. 445 = 1000 - 555
+  
+  // Serial.print("Read duration (ms): ");
+  Serial.println(timestamp);
+  // Serial.println();
 }
