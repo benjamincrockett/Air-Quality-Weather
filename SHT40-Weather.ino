@@ -183,25 +183,21 @@ void loop() {
   display.print(h);
   display.println(" %RH");
 
-  //display.println();
-  display.print("Alpha: ");
-  display.println(alpha);
-
-  display.print("Dewpoint: ");
-  display.println(dew_point);
+  display.print("DWPNT: ");
+  display.print(dew_point);
+  display.println(" *F");
 
   display.println();
   display.print("VOC Index: ");
   display.println(voc_index);
 
-  display.print("Battery: ");
   display.print(measuredBatteryVoltage);
-  display.println(" Volts");
+  display.print(" Volts   ");
 
   timestamp = millis() - timestamp;
-
-  display.print("Loop Time: ");
+  
   display.print(timestamp);
+  display.print(" ms");
 
   delay(10);
   yield();
