@@ -3,7 +3,10 @@
   Adafruit 128x64 OLED FeatherWing:   https://www.adafruit.com/product/4650
   Adafruit Feather M4 Express:        https://www.adafruit.com/product/3857
   Adafruit SGP40 Air Quality Sensor:  https://www.adafruit.com/product/4829
-  STEMMA QT / Qwiic JST SH 4-Pin Cable - 50mm Long  https://www.adafruit.com/product/4399
+
+  Adafruit BMP390 - Precision Barometric Pressure and Altimeter  https://www.adafruit.com/product/4816
+  Adafruit SCD-41 - True CO2 Temperature and Humidity Sensor     https://www.adafruit.com/product/5190
+  STEMMA QT / Qwiic JST SH 4-Pin Cable - 50mm Long               https://www.adafruit.com/product/4399
  
   Use buttons to display sensor serial numbers.
   SHT4x
@@ -19,6 +22,7 @@
   Adafruit GFX Library
   Adafruit SH110X
   Adafruit SGP40 Sensor
+  Adafruit BMP3XX
  ****************************************************/
 
 #include <Adafruit_SHT4x.h>
@@ -28,8 +32,12 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SH110X.h>
 #include <math.h>
+#include <Adafruit_Sensor.h>
+#include "Adafruit_BMP3XX.h"
 
 #define VBATPIN A6
+// #define SEALEVELPRESSURE_HPA (1013.25)
+// https://forecast.weather.gov/data/obhistory/KMLB.html
 
 float measuredBatteryVoltage = 0.0;
 float t, h = 0.0;
@@ -38,16 +46,18 @@ double dew_point = 0.0;
 double alpha = 0.0;
 double a = 17.625;
 double b = 243.04;
+double pressure = 0.0;
 
 Adafruit_SH1107 display = Adafruit_SH1107(64, 128, &Wire);
 Adafruit_SHT4x sht4 = Adafruit_SHT4x();
 Adafruit_SGP40 sgp = Adafruit_SGP40();
+Adafruit_BMP3XX bmp;
 
 void setup() {
   Serial.begin(115200);
   // while (!Serial) { delay(10); } // Wait for serial console to open!
 
-  Serial.println("SHT4x, SGP40, and 128x64 OLED Weather Station");
+  Serial.println("SHT4x, SGP40, BMP3xx, SCD4x, and 128x64 OLED Weather Station");
 
   if (! sgp.begin()){
     Serial.println("SGP40 sensor not found :(");
@@ -109,6 +119,21 @@ void setup() {
        break;
   }
 
+
+  if (!bmp.begin_I2C()) {   // hardware I2C mode, can pass in address & alt Wire
+  //if (! bmp.begin_SPI(BMP_CS)) {  // hardware SPI mode  
+  //if (! bmp.begin_SPI(BMP_CS, BMP_SCK, BMP_MISO, BMP_MOSI)) {  // software SPI mode
+    Serial.println("Could not find a valid BMP3 sensor, check wiring!");
+    while (1);
+  }
+
+  // Set up oversampling and filter initialization
+  bmp.setTemperatureOversampling(BMP3_OVERSAMPLING_8X);
+  bmp.setPressureOversampling(BMP3_OVERSAMPLING_4X);
+  bmp.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3);
+  bmp.setOutputDataRate(BMP3_ODR_50_HZ);
+
+
   display.begin(0x3C, true); // Address 0x3C default
   if (! display.begin()) {
     Serial.println("Couldn't find OLED");
@@ -150,6 +175,15 @@ void loop() {
   // Serial.print("Temp *C = "); Serial.print(t); Serial.print("\t\t");
   // Serial.print("Hum. % = "); Serial.println(h);
 
+
+  if (! bmp.performReading()) {
+    Serial.println("Failed to perform reading :(");
+    return;
+  }
+
+  pressure = bmp.pressure;
+  
+
   sraw = sgp.measureRaw(t, h);
   // Serial.print("Raw measurement: ");
   // Serial.println(sraw);
@@ -190,6 +224,10 @@ void loop() {
   display.println();
   display.print("VOC Index: ");
   display.println(voc_index);
+
+  // display.print("Pressure = ");
+  display.print(pressure / 100.0);
+  display.println(" hPa");
 
   display.print(measuredBatteryVoltage);
   display.print(" Volts   ");
