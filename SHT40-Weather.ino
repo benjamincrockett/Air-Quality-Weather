@@ -89,8 +89,8 @@ void PrintUint64(uint64_t& value) {
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial) { delay(100); } // Wait for serial console to open!
-  // delay(1000);
+  // while (!Serial) { delay(100); } // Wait for serial console to open!
+  delay(100); // To be used instead of the while delay. 
 
   Serial.println("SHT4x, SGP40, BMP3xx, SCD4x, and 128x64 OLED Weather Station");
 
