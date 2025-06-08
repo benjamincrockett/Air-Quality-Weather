@@ -1,5 +1,5 @@
 # Description
- A small air quality, temperature, relative humidity, and CO2 display using a SHT4x, SGP40, BMP390, SCD41, and a 128x64 OLED running on a Feather M4 Express.
+A small air quality and weather sensor running on a Feather M4 Express using a 128x64 OLED display, temperature, humidity, atmospheric pressure, and CO2 sensors.
 
 # Hardware Used
 Adafruit Feather M4 Express
